@@ -4,6 +4,7 @@
 #include <QMainWindow>
 
 #include <string>
+#include <cstdlib>
 
 #include <boost/beast.hpp>
 #include <boost/asio/connect.hpp>
@@ -30,7 +31,8 @@ private:
     std::string getResponse(std::string ip);
     std::string getFieldFromJson(std::string json, std::string field);
     void OpenBrowser(double lat, double lon);
-    QString FormatOutput();
+    void FormatOutput(std::string field, std::string name);
+    std::string getOS();
 
 private slots:
     void Check();

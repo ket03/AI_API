@@ -1,14 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-const static std::string MAIN_API = "ip-api.com";
-const static std::string API_ARGUMENTS = "/json/";
+const std::string MAIN_API = "ip-api.com";
+const std::string API_ARGUMENTS = "/json/";
 namespace http = boost::beast::http;
-
-
-// определить на какой ОС запускается прога
-// открытие браузера с геолокацией
-// функция форматирования вывода
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -16,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     connect(ui->send, SIGNAL(clicked()), this, SLOT(Check()));
+    connect(ui->ip_input, SIGNAL(returnPressed()), this, SLOT(Check()));
 }
 
 MainWindow::~MainWindow()
@@ -25,37 +21,42 @@ MainWindow::~MainWindow()
 
 void MainWindow::Check() {
     ui->info->clear();
-    bool isAddress = false;
     std::string ip_input = ui->ip_input->text().toStdString();
     std::string res_str = getResponse(ip_input);
-    std::string reserve;
-    QString formatted;
-    double lat, lon;
+    std::string reserve = "";
+    double lat = 0, lon = 0;
+    bool is_address = false;
 
     if (ui->continent_check->isChecked())
-        ui->info->setText(ui->info->text() + QString::fromStdString(getFieldFromJson(res_str, "continent")));
+        FormatOutput(getFieldFromJson(res_str, "continent"), "continent");
     if (ui->country_check->isChecked())
-        ui->info->setText(ui->info->text() + QString::fromStdString(getFieldFromJson(res_str, "country")));
+        FormatOutput(getFieldFromJson(res_str, "country"), "country");
     if (ui->region_check->isChecked())
-        ui->info->setText(ui->info->text() + QString::fromStdString(getFieldFromJson(res_str, "regionName")));
+        FormatOutput(getFieldFromJson(res_str, "region"), "region");
     if (ui->city_check->isChecked())
-        ui->info->setText(ui->info->text() + QString::fromStdString(getFieldFromJson(res_str, "city")));
+        FormatOutput(getFieldFromJson(res_str, "city"), "city");
     if (ui->lat_check->isChecked()) {
         reserve = getFieldFromJson(res_str, "lat");
-        formatted = FormatOutput();
-        ui->info->setText(ui->info->text() + QString::fromStdString(reserve));
-        lat = std::stod(getFieldFromJson(res_str, "lat"));
+        if (reserve != "") {
+            lat = std::stod(reserve);
+            is_address = true;
+        }
+        FormatOutput(reserve, "lat");
     }
     if (ui->lon_check->isChecked()) {
         reserve = getFieldFromJson(res_str, "lon");
-        ui->info->setText(ui->info->text() + QString::fromStdString(reserve));
-        lon = std::stod(getFieldFromJson(res_str, "lon"));
+        if (reserve != "") {
+            lon = std::stod(reserve);
+            is_address = true;
+        }
+        FormatOutput(reserve, "lon");
     }
     if (ui->timezone_check->isChecked())
-        ui->info->setText(ui->info->text() + QString::fromStdString(getFieldFromJson(res_str, "timezone")));
+        FormatOutput(getFieldFromJson(res_str, "timezone"), "timezone");
     if (ui->name_check->isChecked())
-        ui->info->setText(ui->info->text() + QString::fromStdString(getFieldFromJson(res_str, "asname")));
-    if (isAddress)
+        FormatOutput(getFieldFromJson(res_str, "asname"), "asname");
+
+    if (is_address)
         OpenBrowser(lat, lon);
 }
 
@@ -91,20 +92,36 @@ std::string MainWindow::getFieldFromJson(std::string json, std::string field) {
     std::stringstream jsonEncoded(json);
     boost::property_tree::ptree root;
     boost::property_tree::read_json(jsonEncoded, root);
-
     boost::optional<boost::property_tree::ptree&> cont_node = root.get_child_optional(field);
+
     if (cont_node)
-        return field + ": " + root.get<std::string>(field) + '\n';
-    else return field + ": null\n";
+        return root.get<std::string>(field);
+    else return "";
 }
 
 void MainWindow::OpenBrowser(double lat, double lon) {
+    std::string command = "";
+    std::string OS = getOS();
     std::string url = "https://geotree.ru/coordinates?lat=" + std::to_string(lat) + "&lon=" + std::to_string(lon) + "&z=15&c=";
-    std::string command = "open " + url; // для macOS
-
+    if (OS == "mac" || OS == "linux")
+        command = "open " + url;
+    else if (OS == "windows")
+        command = "start " + url;
     system(command.c_str());
 }
 
-QString MainWindow::FormatOutput() {
+void MainWindow::FormatOutput(std::string field, std::string name) {
+    if (field == "")
+        ui->info->setText(ui->info->text() + QString::fromStdString(name) + ": null" + '\n');
+    else ui->info->setText(ui->info->text() + QString::fromStdString(name) + ": " + QString::fromStdString(field) + '\n');
+}
 
+std::string MainWindow::getOS() {
+    #ifdef _WIN32
+        return "windows";
+    #elif __APPLE__
+        return "mac";
+    #elif __linux__
+        return "linux";
+    #endif
 }

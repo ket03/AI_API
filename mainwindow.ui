@@ -49,6 +49,9 @@
     <property name="text">
      <string>Continent</string>
     </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QCheckBox" name="country_check">
     <property name="geometry">
@@ -61,6 +64,9 @@
     </property>
     <property name="text">
      <string>Country</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QCheckBox" name="region_check">
@@ -75,6 +81,9 @@
     <property name="text">
      <string>Region name</string>
     </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QCheckBox" name="city_check">
     <property name="geometry">
@@ -87,6 +96,9 @@
     </property>
     <property name="text">
      <string>City</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QCheckBox" name="lat_check">
@@ -101,6 +113,9 @@
     <property name="text">
      <string>Lat</string>
     </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QCheckBox" name="lon_check">
     <property name="geometry">
@@ -113,6 +128,9 @@
     </property>
     <property name="text">
      <string>Lon</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QCheckBox" name="timezone_check">
@@ -127,6 +145,9 @@
     <property name="text">
      <string>Timezone</string>
     </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QCheckBox" name="name_check">
     <property name="geometry">
@@ -139,6 +160,9 @@
     </property>
     <property name="text">
      <string>Name</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLabel" name="info">
